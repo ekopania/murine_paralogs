@@ -1,0 +1,1 @@
+/home/ek112884/software/core/generators/mafft_gen.py
