@@ -909,6 +909,9 @@ with open(log_file, "w") as logfile:
     core.PWS("# ----------------", logfile);
     # Reads the mouse and target annotation info.
 
+    print(mus_pids['ENSMUSP00000000573']);
+    exit();
+
     # core.PWS("# Reading mouse seqs: " + mus_seq_file + " " + mus_transcripts, logfile);
     # mus_seqs, mus_expected = readSeqInfo(mus_seq_file, mus_transcripts);
     # core.PWS("# ----------------", logfile);

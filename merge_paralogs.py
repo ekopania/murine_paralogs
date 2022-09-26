@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+#NOTES: 9/24/2022
+	#If a paralog maps to 2 exons, script is currently appending exon twice - NEED TO FIX THIS; Gregg's script doesn't do this so need to solve that
+	#BUT exonerate2cds is currently adding EVERY paralog for a gene to the exonerate2cds output EVEN IF THE PARALOG ONLY MAPS TO EXONS NOT FOUND IN THAT PROTEIN (if found in other proteins of that gene); probably due to modifications I made to Gregg's exonerate2cds script? So need to figure that out
+	#UPDATE: If exon appears in multiple proteins, it is only associated with one in the output file; Gregg only included on protein per gene I believe (filtering by txpt w/ most targets); may need to apply this kind of filtering such that only one pid per gene is included BEFORE running exonerate2cds (and possibly earlier in pipeline); some of these proteins are nonsense-mediated decay, etc; this  info is in Ensembl and there are few enough genes that I can filter on this manually
+
 #PURPOSE: Merge "paralogs" that align to different exons (may not be separate paralogs; trying to prevent things from being filtered due to gappiness)
 
 import sys
@@ -12,7 +17,8 @@ import mseq
 #Eventually make input directory an argument so that we can do this for different exonerate runs with different parameters, filtering, etc
 
 #Loop through exonerate output csv: sample-segments-exonerate.csv
-exonerate2cds_out = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED-f50/sample-segments-exonerate.csv"
+exonerate2cds_out = "sample-segments-exonerate.debug_test.csv" #Subset for debugging
+#exonerate2cds_out = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED-f50/sample-segments-exonerate.csv"
 samp_exons = {};
 removed_paralog_count = 0;
 removed_paralogs = [];
@@ -46,28 +52,37 @@ for line in open(exonerate2cds_out):
         removed_paralog_count += 1;
 
 print("Number of paralogs removed: " + str(removed_paralog_count));
-print("First few removed paralogs:")
-print(removed_paralogs[1:10])
+print("First few removed paralogs:");
+print(removed_paralogs[1:10]);
+#Write removed paralogs to file
+rp_out = open("removed_paralogs.txt", "w");
+for line in removed_paralogs:
+    rp_out.write(line);
+    rp_out.write("\n");
+rp_out.close();
 
 #Loop through dictionary we just made containing sample IDs, exon IDs, gene IDs, and paralog numbers
 samp_genes = {};
 for i in samp_exons:
-    s_g = samp_exons[i]['samp-gene'];
+    s_g = samp_exons[i]['samp-gene'] + "_" + samp_exons[i]['pid'];
     gene = samp_exons[i]['pid'];
     #Use Gregg's fastaGetDict() function from mseq.py to read in the fasta for this gene (protein) as a dictionary
     in_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED-f50/nt/" + gene + ".fa";
     in_fasta = mseq.fastaGetDict(in_file);
-    this_key = ">" + s_g + "-" + samp_exons[i]['paralog']
+    this_key = ">" + samp_exons[i]['samp-gene'] + "-" + samp_exons[i]['paralog'];
     #print(in_fasta.keys());
     #If this sample-gene combination not already in dictionary, add it to dictionary
     if s_g not in samp_genes:
        samp_genes[s_g] = { 'pid' : gene, 'seq' : "" };
     #Append sequence to dictionary
+    print("appending" + str(samp_exons[i]));
     samp_genes[s_g]['seq'] = samp_genes[s_g]['seq'] + in_fasta[this_key];
+    print("new samp_genes: " + str(samp_genes[s_g]));
 
 #Loop through dictionary of sequences and append sequences to the appropriate output fasta file
 for i in samp_genes:
     out_file = samp_genes[i]['pid'] + ".removed_paralogs.fa";
+    print(out_file)
     this_title = ">" + i;
     mseq.writeSeq(out_file, samp_genes[i]['seq'], this_title);
 
