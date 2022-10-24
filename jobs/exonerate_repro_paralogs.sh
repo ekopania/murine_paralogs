@@ -1,8 +1,8 @@
 #!/bin/bash
 # Exonerate command generator
 # PYTHON VERSION: 3.7.10
-# Script call:    06_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -n exonerate_repro_paralogs -part good_lab_reincarnation -tasks 100
-# Runtime:        08/18/2022 10:15:31
+# Script call:    07_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -n exonerate_repro_paralogs -part good_lab_cpu -tasks 72
+# Runtime:        09/29/2022 16:25:21
 # ----------------
 # IO OPTIONS
 # Input directory:        /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS
@@ -15,8 +15,8 @@
 # ----------
 # SLURM OPTIONS
 # Submit file:            /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/scripts/submit/exonerate_repro_paralogs.sh
-# SLURM partition:        good_lab_reincarnation
-# SLURM ntasks:           100
+# SLURM partition:        good_lab_cpu
+# SLURM ntasks:           72
 # SLURM cpus-per-task:    1
 # SLURM mem:              0
 # ----------

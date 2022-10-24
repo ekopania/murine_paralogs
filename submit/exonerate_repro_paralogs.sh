@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ekopania4@gmail.com
 #SBATCH --partition=good_lab_reincarnation
 #SBATCH --nodes=1
-#SBATCH --ntasks=100
+#SBATCH --ntasks=40
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=0
 
-parallel -j 100 < /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/scripts/jobs/exonerate_repro_paralogs.sh
+parallel -j 72 < /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/scripts/jobs/exonerate_repro_paralogs.sh

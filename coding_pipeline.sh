@@ -18,21 +18,31 @@ time -p python 06_frame_exons.py > logs/frame_exons_debug.log
 
 #Run exonerate
 #time -p python 07_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -n exonerate_repro_paralogs -part good_lab_reincarnation -tasks 100 > logs/exonerate_gen.log
+#Run exonerate on RTM samples ONLY
+time -p python 07_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS_RTM/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_RTM -n exonerate_repro_paralogs_RTM -part good_lab_reincarnation -tasks 100 > logs/exonerate_gen.RTM.log
 #Run exonerate on BLAST filtered gene fastas
-time -p python 07_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS_FILTERED/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_BLAST_FILTERED -n exonerate_repro_paralogs_blast_filtered -part good_lab_reincarnation -tasks 100 > logs/exonerate_gen.blast_filtered.log
+#time -p python 07_exonerate_gen_2.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/GENE_FASTAS_FILTERED/ -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_BLASST_FILTERED -n exonerate_repro_paralogs -part good_lab_reincarnation_blast_filtered -tasks 100 > logs/exonerate_gen.blast_filtered.log
 
 #OLD run exonerate - from Gregg
 #time -p python 03_exonerate_gen_2.py -i ../03-Alignments/seq/reproductive-mclennan-coding/ -o ../03-Alignments/exonerate/reproductive-mclennan-coding/ -n exonerate_rep_mcl -part good_lab_reincarnation -tasks 100
 
 #Count number of sample hits for each exon and make a new file with this info; needed for exonerate2cds
+#EDIT THIS SCRIPT FOR DIFFERENT INPUTS
 sbatch 07b_get_exon_counts.sh
 
-#Parse exonerate output
-#time -p python 08_exonerate_to_cds_2_trimmed.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS -f 175 > logs/exonerate-to-cds-f175.log
+#Parse exonerate output; -f 50 because 50 is median from 07b_get_exon_counts.sh
+#time -p python 08_exonerate_to_cds_2_trimmed.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS -f 50 > logs/exonerate-to-cds-f50.log
+#RTM only; -f 16 because 16 is median
+time -p python 08_exonerate_to_cds_2_trimmed.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_RTM -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_RTM -f 16 > logs/exonerate-to-cds-f16.RTM.log
 #BLAST filtered version
-time -p python 08_exonerate_to_cds_2_trimmed.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_BLAST_FILTERED -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED -f 175 > logs/exonerate-to-cds-f175.blast_filtered.log
+#time -p python 08_exonerate_to_cds_2_trimmed.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_BLAST_FILTERED -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED -f 175 > logs/exonerate-to-cds-f175.blast_filtered.log
 #Parse exonerate output WITHOUT mm10 ref seq in output fasta
 #time -p python 08b_exonerate_to_cds_2_trimmed.NOmm10.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_NOmm10 -f 0 > logs/exonerate-to-cds-f0.NOmm10.log
+
+#merge paralogs
+#EDIT THIS SCRIPT FOR DIFFERENT INPUTS
+#Also, run twice, once for nt and once for aa
+python merge_paralogs.py
 
 #Align with mafft
 # mkdir ../MAFFT
@@ -52,6 +62,11 @@ time -p python 10_aln_filter.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSI
 time -p python 10_aln_filter.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/MAFFT/nt/ -f 0 -s 50 -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/FILTERED > logs/aln_filter_s50.log
 #Seqs more than 75% gappy removed; 30 proteins remaining
 time -p python 10_aln_filter.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/MAFFT/nt/ -f 0 -s 75 -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/FILTERED > logs/aln_filter_s75.log
+
+#Get rid of protein ID attended to ends of sample names in final filtered fasta
+#Run from inside FILTERED/nt/ directory
+ls *fa | while read file; do sed -i 's/_|_.*//' ${file}; done
+ls *fa | while read file; do sed -i 's/_ENSMUSP.*//' ${file}; done #For mm10
 
 #Generate tree based on default filter
 time -p python /home/ek112884/software/core/generators/iqtree_gt_gen.py -i /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/FILTERED-f0-seq20-site50/nt -o /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/IQTREE-f0-seq20-site50 -b 1000 -n iqtree_repro_paralogs-f0-seq20-site50 -part good_lab_reincarnation -tasks 8 > logs/iqtree-f0-seq20-site50.log

@@ -800,7 +800,7 @@ pad = 55;
 cwd = os.getcwd();
 # Job vars
 
-annotation_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_exons_full.with_exon_counts.txt"
+annotation_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_exons.selected_txpts.exon_counts.txt"
 # Table matching protein, transcript, gene, and exon IDs
 
 mouse_nt_dir = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_genes-selected-cds-nt-trimmed/"
@@ -909,9 +909,7 @@ with open(log_file, "w") as logfile:
     core.PWS("# ----------------", logfile);
     # Reads the mouse and target annotation info.
 
-    print(mus_pids['ENSMUSP00000000573']);
-    exit();
-
+      
     # core.PWS("# Reading mouse seqs: " + mus_seq_file + " " + mus_transcripts, logfile);
     # mus_seqs, mus_expected = readSeqInfo(mus_seq_file, mus_transcripts);
     # core.PWS("# ----------------", logfile);

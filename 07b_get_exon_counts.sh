@@ -19,10 +19,10 @@
 ## Command(s) to run:
 
 #Directory for exonerate outputs
-dir="/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_BLAST_FILTERED"
+dir="/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE_OUTPUT_RTM"
 
 #Output file
-output="/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_exons_full.with_exon_counts.txt"
+output="/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_exons_full.with_exon_counts.RTM.txt"
 rm "${output}"
 
 first=true
@@ -40,72 +40,4 @@ cat /mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/repro_exons_full.txt | while
 	echo "${line}	${count}" >> "${output}"
 done
 	
-#grep "INFO" Svs2_ENSMUSE00000244955-exonerate.txt | awk '{print $2}' - | sort | uniq | wc -l
-
 echo "Done!"
-
-#i="gene_fastas/slx.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/slxl1.fa" -query $i -out ${name}.blastn.toSlxl1.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/sly.fa" -query $i -out ${name}.blastn.toSly.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/slxl1.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/slx.fa" -query $i -out ${name}.blastn.toSlx.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/sly.fa" -query $i -out ${name}.blastn.toSly.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/sly.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/slx.fa" -query $i -out ${name}.blastn.toSlx.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/slxl1.fa" -query $i -out ${name}.blastn.toSlxl1.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/sstx.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/ssty1.fa" -query $i -out ${name}.blastn.toSsty1.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/ssty2.fa" -query $i -out ${name}.blastn.toSsty2.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/ssty1.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/sstx.fa" -query $i -out ${name}.blastn.toSstx.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/ssty2.fa" -query $i -out ${name}.blastn.toSsty2.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/ssty2.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/sstx.fa" -query $i -out ${name}.blastn.toSstx.out -word_size 11 -outfmt 7
-#blastn -db "gene_fastas/ssty1.fa" -query $i -out ${name}.blastn.toSsty1.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/srsx.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/srsy.fa" -query $i -out ${name}.blastn.toSrsy.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/srsy.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/srsx.fa" -query $i -out ${name}.blastn.toSrsx.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/astx.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/asty.fa" -query $i -out ${name}.blastn.toAsty.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/asty.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/astx.fa" -query $i -out ${name}.blastn.toAstx.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/eif2s3x.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/eif2s3y.fa" -query $i -out ${name}.blastn.toEif2s3y.out -word_size 11 -outfmt 7
-#
-#i="gene_fastas/eif2s3y.fa"
-#name=$(echo "${i}" | cut -d "." -f 1)
-#echo "Generating blast results for ${name}"
-#blastn -db "gene_fastas/eif2s3x.fa" -query $i -out ${name}.blastn.toEif2s3x.out -word_size 11 -outfmt 7

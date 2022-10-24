@@ -17,8 +17,11 @@ import mseq
 #Eventually make input directory an argument so that we can do this for different exonerate runs with different parameters, filtering, etc
 
 #Loop through exonerate output csv: sample-segments-exonerate.csv
-exonerate2cds_out = "sample-segments-exonerate.debug_test.csv" #Subset for debugging
-#exonerate2cds_out = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED-f50/sample-segments-exonerate.csv"
+#exonerate2cds_out = "sample-segments-exonerate.debug_test.csv" #Subset for debugging
+#ALL SAMPLES
+#exonerate2cds_out = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS-f50/sample-segments-exonerate.csv"
+#RTM DATASET
+exonerate2cds_out = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_RTM-f16/sample-segments-exonerate.csv"
 samp_exons = {};
 removed_paralog_count = 0;
 removed_paralogs = [];
@@ -61,28 +64,43 @@ for line in removed_paralogs:
     rp_out.write("\n");
 rp_out.close();
 
+#Some paralogs map to multiple exons - only count these once!
+
 #Loop through dictionary we just made containing sample IDs, exon IDs, gene IDs, and paralog numbers
 samp_genes = {};
+paralog_tracker = {};
 for i in samp_exons:
     s_g = samp_exons[i]['samp-gene'] + "_" + samp_exons[i]['pid'];
     gene = samp_exons[i]['pid'];
     #Use Gregg's fastaGetDict() function from mseq.py to read in the fasta for this gene (protein) as a dictionary
-    in_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_BLAST_FILTERED-f50/nt/" + gene + ".fa";
+    #in_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS-f50/nt/" + gene + ".fa";
+    in_file = "/mnt/beegfs/ek112884/murinae/PARALOG_PROCESSING/EXONERATE2CDS_RTM-f16/aa/" + gene + ".fa"
     in_fasta = mseq.fastaGetDict(in_file);
-    this_key = ">" + samp_exons[i]['samp-gene'] + "-" + samp_exons[i]['paralog'];
+    full_name = samp_exons[i]['samp-gene'] + "-" + samp_exons[i]['paralog'];
+    this_key = ">" + full_name;
     #print(in_fasta.keys());
+    #Make sure mm10 gets included too
+    mm10 = "mm10_" + gene;
+    if mm10 not in samp_genes:
+        samp_genes[mm10] = { 'pid' : gene, 'seq' : in_fasta['>mm10'] };
     #If this sample-gene combination not already in dictionary, add it to dictionary
     if s_g not in samp_genes:
-       samp_genes[s_g] = { 'pid' : gene, 'seq' : "" };
-    #Append sequence to dictionary
-    print("appending" + str(samp_exons[i]));
-    samp_genes[s_g]['seq'] = samp_genes[s_g]['seq'] + in_fasta[this_key];
-    print("new samp_genes: " + str(samp_genes[s_g]));
+        samp_genes[s_g] = { 'pid' : gene, 'seq' : "" };
+        paralog_tracker[s_g] = { 'paralogs' : [] };
+    if samp_exons[i]['paralog'] in paralog_tracker[s_g]['paralogs']:
+        print(samp_exons[i]['paralog'] + " already appended; skipping...");
+    else:
+        #Append sequence to dictionary
+        #print("appending" + str(samp_exons[i]));
+        samp_genes[s_g]['seq'] = samp_genes[s_g]['seq'] + in_fasta[this_key];
+        #print("new samp_genes: " + str(samp_genes[s_g]));
+        #Append paralog to paralog tracker
+        paralog_tracker[s_g]['paralogs'].append(samp_exons[i]['paralog'])
 
 #Loop through dictionary of sequences and append sequences to the appropriate output fasta file
 for i in samp_genes:
     out_file = samp_genes[i]['pid'] + ".removed_paralogs.fa";
-    print(out_file)
+    #print(out_file)
     this_title = ">" + i;
     mseq.writeSeq(out_file, samp_genes[i]['seq'], this_title);
 
